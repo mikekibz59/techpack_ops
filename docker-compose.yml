@@ -5,14 +5,15 @@ services:
       dockerfile: Dockerfile
     container_name: techpack_ops_frontend
     ports:
-      - "3000:5173"
+      - '3000:5173'
     volumes:
       - ./techpack_ops_frontend:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - ./.env/techpack_ops_frontend
     networks:
       - techpack_network
+
   backend:
     build:
       context: ./techpack_ops_backend
@@ -22,12 +23,33 @@ services:
       - '8000:8000'
     volumes:
       - ./techpack_ops_backend:/app
+      - ./techpack_ops_backend/data:/app/data
     environment:
-      - PYTHONUNBUFFERED=1
+      - ./.env.techpack_ops_backend
     working_dir: /app/api
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - minio
     networks:
       - techpack_network
+
+  minio:
+    image: minio/minio:latest
+    container_name: techpack_minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      - ./.env.minio
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - techpack_network
+
+volumes:
+  minio_data:
+
 networks:
   techpack_network:
     driver: bridge
