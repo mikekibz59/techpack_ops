@@ -26,7 +26,7 @@ services:
       - ./techpack_ops_backend/data:/app/data
     environment:
       - ./.env.techpack_ops_backend
-    working_dir: /app/api
+    working_dir: /app
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - minio

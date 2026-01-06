@@ -5,3 +5,6 @@ pydantic
 sqlalchemy
 alembic
 aiosqlite
+fastapi-users[sqlalchemy]
+passlib[bcrypt]
+python-jose[cryptography]
