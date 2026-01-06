@@ -47,3 +47,4 @@ __screenshots__/
 
 # Python
 __pycache__
+*.pyc
