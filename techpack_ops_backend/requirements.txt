@@ -8,3 +8,6 @@ aiosqlite
 fastapi-users[sqlalchemy]
 passlib[bcrypt]
 python-jose[cryptography]
+fastapi-users
+fastapi-users-db-sqlalchemy
+pytest

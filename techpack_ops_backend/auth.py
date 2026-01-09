@@ -5,7 +5,7 @@ from typing import Optional
 from fastapi import Depends, Request, HTTPException
 from fastapi_users import BaseUserManager, FastAPIUsers, IntegerIDMixin
 from fastapi_users.authentication import AuthenticationBackend, BearerTransport, JWTStrategy
-from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from models.user import User
 from database import get_async_session
 
