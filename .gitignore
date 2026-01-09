@@ -13,6 +13,7 @@ dist
 dist-ssr
 coverage
 *.local
+.idea
 
 # Editor directories and files
 .vscode
@@ -35,3 +36,16 @@ coverage
 
 # Vitest
 __screenshots__/
+
+# SQLite
+*.db
+*.sqlite
+
+# secrets
+.env.techpack_ops_backend
+.env.techpack_ops_frontend
+.env.minio
+
+# Python
+__pycache__
+*.pyc
