@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+
 from fastapi.middleware.cors import CORSMiddleware
 from auth import auth_backend, fastapi_users, current_active_user, current_admin_user
 from schemas.user import UserRead, UserCreate, UserUpdate
@@ -21,6 +22,3 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-async def health_check():
-    return {"status": "healthy"}

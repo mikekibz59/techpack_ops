@@ -47,5 +47,5 @@ __screenshots__/
 .env.minio
 
 # Python
-__pycache__
+*/*__pycache__/*
 *.pyc
