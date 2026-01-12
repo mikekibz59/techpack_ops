@@ -5,6 +5,7 @@ from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import NullPool
 from database import Base, get_async_session
+from minio import get_minio_client, get_minio_bucket_name
 from main import app
 from models.user import User
 
@@ -23,6 +24,40 @@ test_engine = create_async_engine(
 )
 
 test_async_session = async_sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
+
+
+class MockMinioClient:
+    def __init__(self):
+        self.uploads = {}
+        self.objects = {}
+        self.parts = {}
+
+    def bucket_exists(self, *_, **__):
+        """conforming to method signature for the method we are mocking"""
+        return True
+
+    def make_bucket(self, *_, **__):
+        """conforming to method signature of the method we are mocking"""
+        pass
+
+    def presigned_get_object(self, bucket_name, object_name, expires):
+        return f"http://minio-test/{bucket_name}/{object_name}?expires={expires}"
+
+    def list_objects(self, bucket_name, prefix="", recursive=False):
+        return [
+            type("obj", (object,), {"object_name": name, "size": len(obj["data"]), "last_modified": "2024-01-01"})
+            for name, obj in self.objects.items()
+            if name.startswith(prefix)
+        ]
+
+    def remove_object(self, bucket_name, object_name):
+        if object_name in self.objects:
+            del self.objects[object_name]
+
+
+@pytest.fixture(scope="function")
+def mock_minio():
+    return MockMinioClient()
 
 
 @pytest.fixture(scope="function")
@@ -63,7 +98,15 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     async def override_get_async_session():
         yield db_session
 
+    def override_get_minio():
+        return mock_minio
+
+    def override_get_minio_bucket_name():
+        return "test_techpack_upload"
+
     app.dependency_overrides[get_async_session] = override_get_async_session
+    app.dependency_overrides[get_minio_client] = override_get_minio
+    app.dependency_overrides[get_minio_bucket_name] = override_get_minio_bucket_name
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
@@ -138,7 +181,7 @@ async def authenticated_client(client: AsyncClient, test_user: User) -> AsyncCli
             "password": TEST_PASSWORD,
         },
     )
-    
+
     token = response.json()["access_token"]
     client.headers["Authorization"] = f"Bearer {token}"
     return client

@@ -45,6 +45,7 @@ __screenshots__/
 .env.techpack_ops_backend
 .env.techpack_ops_frontend
 .env.minio
+.env.rustus
 
 # Python
 */*__pycache__/*

@@ -47,6 +47,14 @@ services:
     networks:
       - techpack_network
 
+  rustus:
+    image: s3rius/rustus:latest
+    ports:
+      - "1081:1081"
+    environment:
+      - ./.env.rustus
+    depends_on:
+      - minio
 volumes:
   minio_data:
 
